@@ -3,14 +3,12 @@ package com.tp.hair_salon_app.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tp.hair_salon_app.models.AppClient;
-import com.tp.hair_salon_app.models.AppUser;
-import com.tp.hair_salon_app.models.RendezVous;
-import com.tp.hair_salon_app.models.dto.AppUserDto;
 import com.tp.hair_salon_app.models.dto.ClientDto;
 import com.tp.hair_salon_app.models.dto.EmployeDto;
 import com.tp.hair_salon_app.models.dto.RendezVousDto;
 import com.tp.hair_salon_app.services.servicesImpl.ClientServiceImpl;
 import com.tp.hair_salon_app.services.servicesImpl.UserServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Tag(name = "/client/")
 public class ClientController {
 
     private ClientServiceImpl clientService;

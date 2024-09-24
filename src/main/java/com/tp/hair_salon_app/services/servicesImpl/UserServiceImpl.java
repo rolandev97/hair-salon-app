@@ -9,16 +9,20 @@ import com.tp.hair_salon_app.repositories.UserRepository;
 import com.tp.hair_salon_app.services.IUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements IUserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper){
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
     }
     @Override
@@ -37,6 +41,28 @@ public class UserServiceImpl implements IUserService {
         appUser1.setNumeroTelephone(appUser.getNumeroTelephone());
 
         return convertToDto(this.userRepository.save(appUser1));
+    }
+
+    @Override
+    public ResponseEntity changePassword(Long id, String oldPass, String newPass) {
+        //Check if user exist
+        AppUser user = this.userRepository.findById(id).orElseThrow( ()-> new ResourceNotFoundException("This resource ", "UserID not found ", id));
+
+        //Check if password are the same
+        if(!passwordEncoder.matches(oldPass, user.getMotDePasse())){
+            return ResponseEntity.badRequest().body("Les mots de passe ne correspondent pas!");
+        }
+
+        //Change pass and save
+        user.setMotDePasse(passwordEncoder.encode(newPass));
+        this.userRepository.save(user);
+
+        return ResponseEntity.ok().body(user);
+    }
+
+    @Override
+    public AppUserDto findByEmail(String email) {
+        return convertToDto(this.userRepository.findByEmail(email).get());
     }
 
     AppUserDto convertToDto(AppUser appUser) {

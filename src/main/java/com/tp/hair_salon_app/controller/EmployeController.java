@@ -10,6 +10,7 @@ import com.tp.hair_salon_app.models.dto.EmployeDto;
 import com.tp.hair_salon_app.models.dto.RendezVousDto;
 import com.tp.hair_salon_app.services.servicesImpl.EmployeeServiceImpl;
 import com.tp.hair_salon_app.services.servicesImpl.UserServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Tag(name = "/employe/")
 public class EmployeController {
     private EmployeeServiceImpl employeeService;
 

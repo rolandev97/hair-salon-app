@@ -1,26 +1,43 @@
 package com.tp.hair_salon_app;
 
+import com.tp.hair_salon_app.models.Admin;
 import com.tp.hair_salon_app.models.AppService;
+import com.tp.hair_salon_app.models.AppUser;
+import com.tp.hair_salon_app.models.Role;
 import com.tp.hair_salon_app.repositories.ServiceRepository;
+import com.tp.hair_salon_app.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Time;
 
 @SpringBootApplication
-public class HairSalonAppApplication implements CommandLineRunner {
+public class HairSalonAppApplication extends SpringBootServletInitializer implements CommandLineRunner {
 
     @Autowired
     private ServiceRepository serviceRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public static void main(String[] args) {
         SpringApplication.run(HairSalonAppApplication.class, args);
     }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(HairSalonAppApplication.class);
+    }
+
     @Bean
     ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
@@ -30,6 +47,18 @@ public class HairSalonAppApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        AppUser appUser = new Admin();
+        appUser.setEmail("admin@admin.com");
+        appUser.setMotDePasse(passwordEncoder.encode("admin"));
+        appUser.setPrenom("Admin");
+        appUser.setNom("Admin");
+        appUser.setNumeroTelephone("+32465979370");
+        appUser.setRole(Role.ADMIN);
+
+        if(userRepository.findByEmail(appUser.getEmail()).isEmpty()){
+            userRepository.save(appUser);
+        }
+
         if(serviceRepository.count() == 0){
             AppService appService = new AppService();
             appService.setNom("COUPE");

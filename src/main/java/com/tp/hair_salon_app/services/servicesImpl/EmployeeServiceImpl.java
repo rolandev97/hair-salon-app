@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
@@ -38,9 +39,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
     private ServiceRendezVousRepository serviceRendezVousRepository;
     private FactureRepository factureRepository;
     private JourFerieRepository jourFerieRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployeeServiceImpl(ClientRepository clientRepository, JourFerieRepository jourFerieRepository,FactureRepository factureRepository,EmployeRepository employeRepository, JourRepository jourRepository,RendezVousRepository rendezVousRepository, ServiceRendezVousRepository serviceRendezVousRepository,ModelMapper modelMapper){
+    public EmployeeServiceImpl(ClientRepository clientRepository, JourFerieRepository jourFerieRepository,FactureRepository factureRepository,EmployeRepository employeRepository, JourRepository jourRepository,RendezVousRepository rendezVousRepository, ServiceRendezVousRepository serviceRendezVousRepository,ModelMapper modelMapper, PasswordEncoder passwordEncoder1){
         this.clientRepository = clientRepository;
         this.rendezVousRepository = rendezVousRepository;
         this.serviceRendezVousRepository = serviceRendezVousRepository;
@@ -49,6 +51,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
         this.modelMapper = modelMapper;
         this.factureRepository = factureRepository;
         this.jourRepository = jourRepository;
+        this.passwordEncoder = passwordEncoder1;
     }
 
     @Override
@@ -58,6 +61,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
                     .forEach(planning -> planning.setEmploye(employe));
         }
         // Enregistrer l'employé et ses plannings
+        employe.setMotDePasse(passwordEncoder.encode(employe.getMotDePasse()));
+        Employe employe1 = this.employeRepository.findEmployeByEmail(employe.getEmail());
+        if(employe1 != null){
+            throw new ResourceNotFoundException("Employe", employe1.getEmail(),"Un utilisateur avec cette adresse mail existe deja!");
+        }
         Employe savedEmployee = this.employeRepository.save(employe);
         return ResponseEntity.status(HttpStatus.OK).body("L'employé à été enregistré avec succès !");
     }

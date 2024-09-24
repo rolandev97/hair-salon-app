@@ -37,7 +37,7 @@ public class AppUser {
     @Column(name = "numero_telephone")
     private String numeroTelephone;
 
-    @Column(name = "role", insertable = false, updatable = false)
+    @Column(insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

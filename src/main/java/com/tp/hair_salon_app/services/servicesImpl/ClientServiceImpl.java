@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
@@ -32,16 +33,17 @@ public class ClientServiceImpl implements IClientService {
     private ServiceRendezVousRepository serviceRendezVousRepository;
     private JourRepository jourRepository;
     private ModelMapper modelMapper;
-
     private EmployeRepository employeRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ClientServiceImpl(ClientRepository clientRepository, EmployeRepository employeRepository, JourRepository jourRepository,RendezVousRepository rendezVousRepository, ServiceRendezVousRepository serviceRendezVousRepository,ModelMapper modelMapper){
+    public ClientServiceImpl(ClientRepository clientRepository, PasswordEncoder passwordEncoder,EmployeRepository employeRepository, JourRepository jourRepository,RendezVousRepository rendezVousRepository, ServiceRendezVousRepository serviceRendezVousRepository,ModelMapper modelMapper){
         this.clientRepository = clientRepository;
         this.rendezVousRepository = rendezVousRepository;
         this.serviceRendezVousRepository = serviceRendezVousRepository;
         this.employeRepository = employeRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
         this.jourRepository = jourRepository;
     }
 
@@ -132,6 +134,11 @@ public class ClientServiceImpl implements IClientService {
 
     @Override
     public ClientDto create(AppClient client) {
+        AppClient appClient = clientRepository.findByEmail(client.getEmail());
+        if(appClient != null){
+            throw new ResourceNotFoundException("Client", appClient.getEmail(),"Un utilisateur avec cette adresse mail existe deja!");
+        }
+        client.setMotDePasse(passwordEncoder.encode(client.getMotDePasse()));
         return convertClientToDto(this.clientRepository.save(client));
     }
 
