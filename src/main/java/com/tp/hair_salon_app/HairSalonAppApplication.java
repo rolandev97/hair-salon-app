@@ -1,18 +1,26 @@
 package com.tp.hair_salon_app;
 
+import com.tp.hair_salon_app.models.AppService;
+import com.tp.hair_salon_app.repositories.ServiceRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.sql.Time;
+
 @SpringBootApplication
-public class HairSalonAppApplication {
+public class HairSalonAppApplication implements CommandLineRunner {
+
+    @Autowired
+    private ServiceRepository serviceRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(HairSalonAppApplication.class, args);
     }
-
     @Bean
     ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
@@ -20,5 +28,34 @@ public class HairSalonAppApplication {
         return modelMapper;
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+        if(serviceRepository.count() == 0){
+            AppService appService = new AppService();
+            appService.setNom("COUPE");
+            appService.setDuree(Time.valueOf("00:30:00"));
+            appService.setMontant(25.00);
+            appService.setDevise("€");
+            AppService appService1 = new AppService();
+            appService1.setNom("BRUSHING");
+            appService1.setDuree(Time.valueOf("00:30:00"));
+            appService1.setMontant(25.00);
+            appService1.setDevise("€");
+            AppService appService2 = new AppService();
+            appService2.setNom("COLORATION");
+            appService2.setDuree(Time.valueOf("01:00:00"));
+            appService2.setMontant(50.00);
+            appService2.setDevise("€");
+            AppService appService3 = new AppService();
+            appService3.setNom("SOINS");
+            appService3.setDuree(Time.valueOf("00:45:00"));
+            appService3.setMontant(30.00);
+            appService3.setDevise("€");
 
+            serviceRepository.save(appService);
+            serviceRepository.save(appService1);
+            serviceRepository.save(appService2);
+            serviceRepository.save(appService3);
+        }
+    }
 }

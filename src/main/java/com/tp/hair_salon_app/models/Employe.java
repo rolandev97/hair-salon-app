@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("employe")
+@DiscriminatorValue("EMPLOYE")
 @Getter @Setter
 public class Employe extends AppUser {
 
     @OneToMany(mappedBy = "employe")
     private Set<RendezVous> rendezVous;
 
-    @OneToMany(mappedBy = "employe")
+    @OneToMany(mappedBy = "employe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Jour> planning;
 
 }

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity(name = "user")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
@@ -35,7 +37,9 @@ public class AppUser {
     @Column(name = "numero_telephone")
     private String numeroTelephone;
 
+    @Column(name = "role", insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Role role; // "CLIENT", "EMPLOYE", "ADMIN"
+    private Role role;
+
 }
 

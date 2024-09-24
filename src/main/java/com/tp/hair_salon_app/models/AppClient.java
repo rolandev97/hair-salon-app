@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("client")
+@DiscriminatorValue("CLIENT")
 @Getter @Setter
 public class AppClient extends AppUser {
     @Id

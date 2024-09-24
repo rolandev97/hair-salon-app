@@ -4,6 +4,7 @@ import com.tp.hair_salon_app.exception.ResourceNotFoundException;
 import com.tp.hair_salon_app.models.AppUser;
 import com.tp.hair_salon_app.models.Role;
 import com.tp.hair_salon_app.models.dto.AppUserDto;
+import com.tp.hair_salon_app.repositories.ClientRepository;
 import com.tp.hair_salon_app.repositories.UserRepository;
 import com.tp.hair_salon_app.services.IUserService;
 import org.modelmapper.ModelMapper;
@@ -22,9 +23,7 @@ public class UserServiceImpl implements IUserService {
     }
     @Override
     public AppUserDto createUser(AppUser appUser) {
-        if(appUser.getRole().name().isEmpty()){
-            appUser.setRole(Role.CLIENT);
-        }
+        appUser.setRole(Role.CLIENT);
         AppUser userResp = this.userRepository.save(appUser);
         return convertToDto(userResp);
     }

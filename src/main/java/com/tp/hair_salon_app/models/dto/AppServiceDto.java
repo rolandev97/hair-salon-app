@@ -1,5 +1,6 @@
-package com.tp.hair_salon_app.models;
+package com.tp.hair_salon_app.models.dto;
 
+import com.tp.hair_salon_app.models.ServiceRendezVous;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,18 +8,14 @@ import lombok.Setter;
 import java.sql.Time;
 import java.util.Set;
 
-@Entity(name = "service")
 @Getter @Setter
-public class AppService {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AppServiceDto {
     private Long id;
     private String nom;
     private double montant;
     private Time duree;
     private String devise;
 
-    @OneToMany(mappedBy = "services")
-    private Set<ServiceRendezVous> serviceRendezVous;
+    private Set<ServiceRendezVousDto> serviceRendezVousDtos;
 
 }

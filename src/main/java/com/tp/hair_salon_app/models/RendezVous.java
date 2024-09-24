@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Time;
 import java.util.List;
 import java.util.Set;
@@ -31,10 +31,10 @@ public class RendezVous {
     @NotNull(message = "La durée est obligatoire.")
     private Time duree;
 
+    @OneToMany(mappedBy = "rendezVous")
+    private Set<ServiceRendezVous> serviceRendezVous;
     @ManyToOne
     private AppClient client;
     @ManyToOne
     private Employe employe;
-    @OneToMany(mappedBy = "rendezVous")
-    private Set<ServiceRendezVous> serviceRendezVous;
 }

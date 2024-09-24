@@ -13,6 +13,6 @@ package com.tp.hair_salon_app.models;
 public enum Role {
     CLIENT,
     EMPLOYE,
-    ADMIN
+    ADMIN;
 }
 

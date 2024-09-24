@@ -12,9 +12,10 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Set;
 
+@Getter @Setter
 public class EmployeDto extends AppUserDto {
 
-    private Set<RendezVous> rendezVous;
-    private List<Jour> planning;
+    private Set<RendezVousDto> rendezVousDtos;
+    private List<JourDto> planningDto;
 
 }

@@ -10,5 +10,5 @@ import java.util.Set;
 
 public class ClientDto extends AppUserDto {
     private Long id;
-    private Set<RendezVous> rendezVous;
+    private Set<RendezVousDto> rendezVousDtos;
 }
