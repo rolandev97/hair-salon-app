@@ -1,6 +1,7 @@
 package com.tp.hair_salon_app.services.servicesImpl;
 
-import com.tp.hair_salon_app.exception.ResourceNotFoundException;
+import com.tp.hair_salon_app.exception.BadRequestException;
+import com.tp.hair_salon_app.exception.NotFoundException;
 import com.tp.hair_salon_app.models.*;
 import com.tp.hair_salon_app.models.dto.*;
 import com.tp.hair_salon_app.repositories.*;
@@ -64,7 +65,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
         employe.setMotDePasse(passwordEncoder.encode(employe.getMotDePasse()));
         Employe employe1 = this.employeRepository.findEmployeByEmail(employe.getEmail());
         if(employe1 != null){
-            throw new ResourceNotFoundException("Employe", employe1.getEmail(),"Un utilisateur avec cette adresse mail existe deja!");
+            throw new BadRequestException("User already exist!");
         }
         Employe savedEmployee = this.employeRepository.save(employe);
         return ResponseEntity.status(HttpStatus.OK).body("L'employé à été enregistré avec succès !");
@@ -115,12 +116,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
         // Vérifier si l'employé est disponible pour la plage horaire choisie
         Optional<Employe> employeOpt = employeRepository.findById(rendezVousDto.getEmployeDto().getId());
         if (employeOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employé non trouvé");
+            throw new NotFoundException("User not found ID : "+rendezVousDto.getEmployeDto().getId());
+            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employé non trouvé");
         }
         Employe employe = employeOpt.get();
 
         if (!isEmployeDisponible(employe, rendezVousDto.getDate(), rendezVousDto.getHeure(), rendezVousDto.getDuree())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'employé n'est pas disponible à cette heure");
+            throw new BadRequestException("Employe not available at this time! ID : "+rendezVousDto.getEmployeDto().getId());
+            //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'employé n'est pas disponible à cette heure");
         }
         RendezVous rendezVous = new RendezVous();
         rendezVous.setDuree(rendezVousDto.getDuree());
@@ -201,11 +204,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public ResponseEntity<?> createFacture(Long rendezVousId, Long employeeId) {
         // Récupérer le rendez-vous par son ID
         RendezVous rendezVous = rendezVousRepository.findById(rendezVousId)
-                .orElseThrow(() -> new ResourceNotFoundException("RendezVous", rendezVousId.toString(),"Rendez-vous non trouvé"));
+                .orElseThrow(() -> new NotFoundException("RendezVous not found ID: "+rendezVousId));
 
         // Récupérer l'employé par son ID
         Employe employe = employeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("EmployeException", employeeId.toString(),"Employé non trouvé"));
+                .orElseThrow(() -> new NotFoundException("User not found ID: "+employeeId));
 
         // Calculer le montant total à partir des services associés au rendez-vous
         List<ServiceRendezVous> servicesRendezVous = serviceRendezVousRepository.findByRendezVous(rendezVous);
@@ -230,7 +233,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public ResponseEntity<?> modifierHoraire(Long employeeId, Jour jour) {
         Employe employe = employeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employe ID : ", employeeId.toString(),"Employé non trouvé"));
+                .orElseThrow(() -> new NotFoundException("User not found ID : "+employeeId));
         Jour jour1 = new Jour();
         jour1.setTypeDeJour(jour.getTypeDeJour());
         jour1.setEmploye(employe);
@@ -289,7 +292,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public ResponseEntity<?> ajouterJourConge(Long employeId, Date date, boolean demiJour) {
         Employe employe = employeRepository.findById(employeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employe ID : ", employeId.toString(),"Employé non trouvé"));
+                .orElseThrow(() -> new NotFoundException("User not found : "+employeId));
         Jour jour = new Jour();
         jour.setDateDuJour(date);
         jour.setEmploye(employe);
@@ -322,6 +325,24 @@ public class EmployeeServiceImpl implements IEmployeeService {
         return convertEmplToDto(this.employeRepository.findEmployeByEmail(email));
     }
 
+    @Override
+    public List<RendezVousDto> getEmployeeRendezVous(Long employeId) {
+        List<RendezVous> rendezVous = this.rendezVousRepository.findAllRendezVousByEmployeId(employeId).orElseThrow(() -> new NotFoundException("User not found : "+employeId));
+        return rendezVous.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<JourDto> getJourEmploye(Long employeId) {
+        List<Jour> jourList = this.jourRepository.findAllByEmployeId(employeId).orElseThrow(() -> new NotFoundException("User not found : "+employeId));
+        return jourList.stream().map(this::convertJourToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EmployeDto> getAllEmploye() {
+        List<Employe> employes = this.employeRepository.findAll();
+        return employes.stream().map(this::convertEmplToDto).collect(Collectors.toList());
+    }
+
     public boolean verifierConflitsRendezVous(Long employeId, Date date) {
         List<RendezVous> rendezVousList = rendezVousRepository.findByEmployeIdAndDate(employeId, date);
 
@@ -341,6 +362,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
         rendezVousDto.setEmployeDto(employeDto);
         rendezVousDto.setServiceRendezVousDtos(serviceRendezVousDtos);
         return rendezVousDto;
+    }
+
+    JourDto convertJourToDto(Jour jour){
+        EmployeDto employeDto = this.modelMapper.map(jour.getEmploye(), EmployeDto.class);
+        JourDto jourDto = this.modelMapper.map(jour, JourDto.class);
+        jourDto.setEmployeDto(employeDto);
+
+        return jourDto;
     }
 
     EmployeDto convertEmplToDto(Employe employe){

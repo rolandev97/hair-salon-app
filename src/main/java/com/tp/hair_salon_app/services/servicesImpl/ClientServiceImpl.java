@@ -1,6 +1,7 @@
 package com.tp.hair_salon_app.services.servicesImpl;
 
-import com.tp.hair_salon_app.exception.ResourceNotFoundException;
+import com.tp.hair_salon_app.exception.BadRequestException;
+import com.tp.hair_salon_app.exception.NotFoundException;
 import com.tp.hair_salon_app.models.*;
 import com.tp.hair_salon_app.models.dto.*;
 import com.tp.hair_salon_app.repositories.*;
@@ -52,12 +53,14 @@ public class ClientServiceImpl implements IClientService {
         // Vérifier si l'employé est disponible pour la plage horaire choisie
         Optional<Employe> employeOpt = employeRepository.findById(rendezVousDto.getEmployeDto().getId());
         if (employeOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employé non trouvé");
+            throw new NotFoundException("User not found ID : "+rendezVousDto.getEmployeDto().getId());
+            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employé non trouvé");
         }
         Employe employe = employeOpt.get();
 
         if (!isEmployeDisponible(employe, rendezVousDto.getDate(), rendezVousDto.getHeure(), rendezVousDto.getDuree())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'employé n'est pas disponible à cette heure");
+            throw new BadRequestException("Employe not available at this time! ID : "+rendezVousDto.getEmployeDto().getId());
+            //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'employé n'est pas disponible à cette heure");
         }
         RendezVous rendezVous = new RendezVous();
         rendezVous.setDuree(rendezVousDto.getDuree());
@@ -136,7 +139,7 @@ public class ClientServiceImpl implements IClientService {
     public ClientDto create(AppClient client) {
         AppClient appClient = clientRepository.findByEmail(client.getEmail());
         if(appClient != null){
-            throw new ResourceNotFoundException("Client", appClient.getEmail(),"Un utilisateur avec cette adresse mail existe deja!");
+            throw new BadRequestException("User already exist!");
         }
         client.setMotDePasse(passwordEncoder.encode(client.getMotDePasse()));
         return convertClientToDto(this.clientRepository.save(client));
@@ -150,6 +153,24 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public ClientDto getClientByEmail(String email) {
         return convertClientToDto(this.clientRepository.findByEmail(email));
+    }
+
+    @Override
+    public RendezVousDto getClientRendezVous(Long clientId) {
+        RendezVous rendezVous = this.rendezVousRepository.findRendezVousByClientId(clientId).orElseThrow(() -> new NotFoundException("RendezVous not found"));
+        return convertToDto(rendezVous);
+    }
+
+    @Override
+    public List<RendezVousDto> getAllClientRendezVous(Long clientId) {
+        List<RendezVous> rendezVous = this.rendezVousRepository.findAllRendezVousByClientId(clientId).orElseThrow(() -> new NotFoundException("User not found : "+clientId));
+        return rendezVous.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClientDto> getAllClients() {
+        List<AppClient> appClients = this.clientRepository.findAll();
+        return appClients.stream().map(this::convertClientToDto).collect(Collectors.toList());
     }
 
     public boolean isEmployeDisponible(Employe employe, Date date, Time heure, Time duree) {

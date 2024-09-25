@@ -1,7 +1,7 @@
 package com.tp.hair_salon_app.security;
 
 
-import com.tp.hair_salon_app.exception.ResourceNotFoundException;
+import com.tp.hair_salon_app.exception.NotFoundException;
 import com.tp.hair_salon_app.models.AppUser;
 import com.tp.hair_salon_app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Long id) {
         AppUser user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("AppUser", "ID", id)
+                () -> new NotFoundException("User not found : "+id)
         );
 
         return new UserPrincipal(user);

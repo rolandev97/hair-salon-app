@@ -21,4 +21,7 @@ public interface IClientService {
     ClientDto create(AppClient client);
     ClientDto getClientById(Long clientId);
     ClientDto getClientByEmail(String email);
+    RendezVousDto getClientRendezVous(Long clientId);
+    List<RendezVousDto> getAllClientRendezVous(Long clientId);
+    List<ClientDto> getAllClients();
 }

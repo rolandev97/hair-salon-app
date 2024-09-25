@@ -7,6 +7,7 @@ import com.tp.hair_salon_app.models.Employe;
 import com.tp.hair_salon_app.models.Jour;
 import com.tp.hair_salon_app.models.dto.AppUserDto;
 import com.tp.hair_salon_app.models.dto.EmployeDto;
+import com.tp.hair_salon_app.models.dto.JourDto;
 import com.tp.hair_salon_app.models.dto.RendezVousDto;
 import com.tp.hair_salon_app.services.servicesImpl.EmployeeServiceImpl;
 import com.tp.hair_salon_app.services.servicesImpl.UserServiceImpl;
@@ -61,6 +62,11 @@ public class EmployeController {
         return this.employeeService.annulerRendezVous(rendezVousId);
     }
 
+    @GetMapping("/employe/get-all-rendez-vous/{id}")
+    public List<RendezVousDto> getAllEmployeRendezVous(@PathVariable("id") Long rendezVousId) {
+        return this.employeeService.getEmployeeRendezVous(rendezVousId);
+    }
+
     @GetMapping("/employe/tous-les-rendez-vous")
     public List<RendezVousDto> tousLesRendezVous() {
         return this.employeeService.getRendezVousList();
@@ -113,6 +119,16 @@ public class EmployeController {
     @GetMapping("/employe/{email}")
     public EmployeDto getEmployeByEmail(@PathVariable String email) {
         return employeeService.employeDetailParEmail(email);
+    }
+
+    @GetMapping("/employe/get-all-jour/{id}")
+    public List<JourDto> getEmployeJour(@PathVariable Long id) {
+        return employeeService.getJourEmploye(id);
+    }
+
+    @GetMapping("/employe/get-all")
+    public List<EmployeDto> getAllEmployes() {
+        return employeeService.getAllEmploye();
     }
 
 

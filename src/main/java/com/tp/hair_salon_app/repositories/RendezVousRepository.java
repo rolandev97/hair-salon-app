@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
@@ -23,4 +24,7 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
                                                  @Param("duree") Time duree);
 
     List<RendezVous> findByEmployeIdAndDate(Long employeId, Date date);
+    Optional<RendezVous> findRendezVousByClientId(Long clientId);
+    Optional<List<RendezVous>> findAllRendezVousByEmployeId(Long employeId);
+    Optional<List<RendezVous>> findAllRendezVousByClientId(Long clientId);
 }

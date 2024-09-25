@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@Tag(name = "/client/")
+@Tag(name = "client")
 public class ClientController {
 
     private ClientServiceImpl clientService;
@@ -65,12 +65,17 @@ public class ClientController {
     }
 
     @GetMapping("/client/{clientId}")
-    public ClientDto getEmployeById(@PathVariable Long clientId) {
+    public ClientDto getClientById(@PathVariable Long clientId) {
         return clientService.getClientById(clientId);
     }
 
     @GetMapping("/client/{email}")
     public ClientDto getClientByEmail(@PathVariable String email) {
         return clientService.getClientByEmail(email);
+    }
+
+    @GetMapping("/client/get-rendez-vous/{id}")
+    public RendezVousDto getClientRendezVous(@PathVariable Long id) {
+        return clientService.getClientRendezVous(id);
     }
 }

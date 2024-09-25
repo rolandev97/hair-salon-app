@@ -5,6 +5,7 @@ import com.tp.hair_salon_app.models.Employe;
 import com.tp.hair_salon_app.models.Jour;
 import com.tp.hair_salon_app.models.dto.AppUserDto;
 import com.tp.hair_salon_app.models.dto.EmployeDto;
+import com.tp.hair_salon_app.models.dto.JourDto;
 import com.tp.hair_salon_app.models.dto.RendezVousDto;
 import org.springframework.http.ResponseEntity;
 
@@ -26,4 +27,7 @@ public interface IEmployeeService {
     void supprimerJourConge(Long jourId);
     EmployeDto employeDetailParId(Long employeId);
     EmployeDto employeDetailParEmail(String email);
+    List<RendezVousDto> getEmployeeRendezVous(Long employeId);
+    List<JourDto> getJourEmploye(Long employeId);
+    List<EmployeDto> getAllEmploye();
  }

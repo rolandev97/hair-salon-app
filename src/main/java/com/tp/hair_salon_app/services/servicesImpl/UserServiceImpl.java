@@ -1,6 +1,6 @@
 package com.tp.hair_salon_app.services.servicesImpl;
 
-import com.tp.hair_salon_app.exception.ResourceNotFoundException;
+import com.tp.hair_salon_app.exception.NotFoundException;
 import com.tp.hair_salon_app.models.AppUser;
 import com.tp.hair_salon_app.models.Role;
 import com.tp.hair_salon_app.models.dto.AppUserDto;
@@ -34,7 +34,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public AppUserDto updateUser(AppUser appUser, Long userId) {
-        AppUser appUser1 = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
+        AppUser appUser1 = this.userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found" + appUser.getEmail()));
         appUser1.setEmail(appUser.getEmail());
         appUser1.setNom(appUser.getNom());
         appUser1.setPrenom(appUser.getPrenom());
@@ -46,7 +46,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ResponseEntity changePassword(Long id, String oldPass, String newPass) {
         //Check if user exist
-        AppUser user = this.userRepository.findById(id).orElseThrow( ()-> new ResourceNotFoundException("This resource ", "UserID not found ", id));
+        AppUser user = this.userRepository.findById(id).orElseThrow( ()-> new NotFoundException("User not found : "+id));
 
         //Check if password are the same
         if(!passwordEncoder.matches(oldPass, user.getMotDePasse())){
